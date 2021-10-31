@@ -1,0 +1,36 @@
+[build-system]
+requires = ["flit"]
+build-backend = "flit.buildapi"
+
+[tool.flit.metadata]
+module = "wgus"
+author = "Renat Iliev"
+author-email = "me@izeberg.ru"
+description-file = "README.md"
+home-page = "https://github.com/IzeBerg/python-wgus"
+requires = [
+    "pydantic ==1.8.2",
+    "pytest ==6.2.5",
+    "aiohttp ==3.7.4.post0",
+    "aiodns ==3.0.0",
+    "cchardet ==2.1.7"
+]
+requires-python = ">=3.9"
+
+[tool.flit.metadata.requires-extra]
+test = [
+    "pytest >=6.2.4,<7.0.0",
+    "pytest-cov >=2.12.0,<4.0.0",
+    "mypy ==0.910",
+    "flake8 >=3.8.3,<4.0.0",
+    "black ==21.9b0",
+    "isort >=5.0.6,<6.0.0",
+]
+
+[tool.isort]
+profile = "black"
+known_third_party = ["pydantic", "aiohttp"]
+
+[tool.mypy]
+disable_error_code = ["union-attr"]
+
