@@ -99,13 +99,13 @@ class PatchesChains(BaseModel):
         )
 
 
-async def get_patches_chain(
+async def get_patches_chains(
     host: str,
     guid: str,
     versions: Optional[Dict[str, str]] = None,
     query: Optional[Dict[str, str]] = None,
     meta: Optional[Metadata] = None,
-):
+) -> PatchesChains:
     if query is None:
         query = {}
     if versions is None:
@@ -131,4 +131,4 @@ async def get_patches_chain(
         query.setdefault(f"{p.id}_current_version", versions.get(p.id, "0"))
 
     text = await requests.get(host, "/api/v1/patches_chain/", query)
-    return meta, PatchesChains.parse(text)
+    return PatchesChains.parse(text)
