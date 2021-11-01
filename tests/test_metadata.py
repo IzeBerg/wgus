@@ -1,4 +1,6 @@
-from wgus import Metadata
+import pytest
+
+from wgus import Metadata, get_metadata
 
 
 def test_parse():
@@ -48,3 +50,9 @@ def test_parse():
         meta.predefined_section.client_types.get().id
         == meta.predefined_section.client_types.default
     )
+
+
+@pytest.mark.asyncio
+async def test_get_patches_chains():
+    metadata = await get_metadata("wgus-wotru.wargaming.net", "WOT.RU.PRODUCTION")
+    assert metadata

@@ -1,4 +1,6 @@
-from wgus import PatchesChains
+import pytest
+
+from wgus import PatchesChains, get_patches_chains
 
 
 def test_parse():
@@ -234,3 +236,8 @@ def test_parse():
     </protocol>"""
     chains = PatchesChains.parse(data)
     assert chains
+
+
+@pytest.mark.asyncio
+async def test_get_patches_chains():
+    await get_patches_chains("wgus-wotru.wargaming.net", "WOT.RU.PRODUCTION")

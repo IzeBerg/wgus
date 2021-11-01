@@ -35,7 +35,7 @@ class ClientType(BaseModel):
             arch=xml.get("arch"),
             parts=[
                 ClientTypePart.parse(ctp)
-                for ctp in xml.find("client_parts/client_part")
+                for ctp in xml.iterfind("client_parts/client_part")
             ],
         )
 
@@ -95,10 +95,14 @@ class Metadata(BaseModel):
 async def get_metadata(
     host: str, guid: str, chain_id: Optional[str] = None
 ) -> Metadata:
-    query = {
-        "guid": guid,
-        "chain_id": chain_id or "unknown",
-        "protocol_version": META_PROTOCOL_VERSION,
-    }
-    text = await requests.get(host, "/api/v1/metadata/", query)
-    return Metadata.parse(text)
+    return Metadata.parse(
+        await requests.get(
+            host,
+            "/api/v1/metadata/",
+            {
+                "guid": guid,
+                "chain_id": chain_id or "unknown",
+                "protocol_version": META_PROTOCOL_VERSION,
+            },
+        )
+    )

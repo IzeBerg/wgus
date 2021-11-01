@@ -120,15 +120,18 @@ async def get_patches_chains(
         "metadata_protocol_version": META_PROTOCOL_VERSION,
         "installation_id": INSTALLATION_ID,
     }
-    query.setdefault("client_type", meta.predefined_section.client_types.default)
+    client_type = query.setdefault(
+        "client_type", meta.predefined_section.client_types.default
+    )
     query.setdefault("lang", meta.predefined_section.default_language)
     query.setdefault("metadata_version", meta.version)
 
-    client_type_info = meta.predefined_section.client_types.get(query["client_type"])
+    client_type_info = meta.predefined_section.client_types.get(client_type)
     if client_type_info is None:
         raise Exception("unknown client_type")
     for p in client_type_info.parts:
         query.setdefault(f"{p.id}_current_version", versions.get(p.id, "0"))
 
-    text = await requests.get(host, "/api/v1/patches_chain/", query)
-    return PatchesChains.parse(text)
+    return PatchesChains.parse(
+        await requests.get(host, "/api/v1/patches_chain/", query)
+    )
