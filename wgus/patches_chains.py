@@ -114,12 +114,14 @@ async def get_patches_chains(
     if meta is None:
         meta = await get_metadata(host, guid)
 
-    query |= {
-        "game_id": guid,
-        "protocol_version": PATCHES_PROTOCOL_VERSION,
-        "metadata_protocol_version": META_PROTOCOL_VERSION,
-        "installation_id": INSTALLATION_ID,
-    }
+    query.update(
+        {
+            "game_id": guid,
+            "protocol_version": PATCHES_PROTOCOL_VERSION,
+            "metadata_protocol_version": META_PROTOCOL_VERSION,
+            "installation_id": INSTALLATION_ID,
+        }
+    )
     client_type = query.setdefault(
         "client_type", meta.predefined_section.client_types.default
     )
