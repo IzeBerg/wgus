@@ -10,7 +10,7 @@ from .metadata import Metadata, get_metadata
 
 class PatchTorrent(BaseModel):
     hash: str
-    urls: list[str]
+    urls: List[str]
 
     @classmethod
     def parse(cls, xml: Optional[ElementTree.Element]) -> "PatchTorrent":
@@ -68,7 +68,7 @@ class WebSeedURL(BaseModel):
 
 class PatchesChain(BaseModel):
     type: str
-    patches: list[Patch]
+    patches: List[Patch]
 
     @classmethod
     def parse(cls, xml: ElementTree.Element) -> "PatchesChain":
@@ -79,8 +79,8 @@ class PatchesChain(BaseModel):
 
 
 class PatchesChains(BaseModel):
-    patches_chain: list[PatchesChain]
-    webseeds: list[WebSeedURL]
+    patches_chain: List[PatchesChain]
+    webseeds: List[WebSeedURL]
     meta_need_update: bool
     version_name: str
 

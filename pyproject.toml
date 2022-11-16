@@ -16,7 +16,7 @@ requires = [
     "aiodns >=3.0.0",
     "cchardet >=2.1.7"
 ]
-requires-python = ">=3.9"
+requires-python = ">=3.8"
 
 [tool.flit.metadata.requires-extra]
 test = [
