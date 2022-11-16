@@ -10,13 +10,13 @@ from .metadata import Metadata, get_metadata
 
 class PatchTorrent(BaseModel):
     hash: str
-    urls: Optional[str]
+    urls: list[str]
 
     @classmethod
     def parse(cls, xml: Optional[ElementTree.Element]) -> "PatchTorrent":
         return cls(
             hash=xml.find("hash").text,
-            parts=[u.text for u in xml.find("urls/url")],
+            urls=[u.text for u in xml.iterfind("urls/url")],
         )
 
 
@@ -28,13 +28,11 @@ class PatchFile(BaseModel):
 
     @classmethod
     def parse(cls, xml: ElementTree.Element) -> "PatchFile":
-        diffs_size = xml.find("diffs_size")
-        unpacked_size = xml.find("unpacked_size")
         return cls(
             name=xml.find("name").text,
             size=xml.find("size").text,
-            unpacked_size=unpacked_size.text if unpacked_size else None,
-            diffs_size=diffs_size.text if diffs_size else None,
+            unpacked_size=xml.findtext("unpacked_size"),
+            diffs_size=xml.findtext("diffs_size"),
         )
 
 
@@ -70,24 +68,21 @@ class WebSeedURL(BaseModel):
 
 class PatchesChain(BaseModel):
     type: str
-    patches: List[Patch]
-    webseeds: List[WebSeedURL]
-    meta_need_update: bool
-    version_name: str
+    patches: list[Patch]
 
     @classmethod
     def parse(cls, xml: ElementTree.Element) -> "PatchesChain":
         return cls(
             type=xml.get("type"),
             patches=[Patch.parse(p) for p in xml.iterfind("patch")],
-            webseeds=[WebSeedURL.parse(p) for p in xml.iterfind("web_seeds/url")],
-            meta_need_update=xml.find("meta_need_update").text,
-            version_name=xml.find("version_name").text,
         )
 
 
 class PatchesChains(BaseModel):
-    patches_chain: List[PatchesChain]
+    patches_chain: list[PatchesChain]
+    webseeds: list[WebSeedURL]
+    meta_need_update: bool
+    version_name: str
 
     @classmethod
     def parse(cls, text: str) -> "PatchesChains":
@@ -95,7 +90,10 @@ class PatchesChains(BaseModel):
         return cls(
             patches_chain=[
                 PatchesChain.parse(pc) for pc in xml.iterfind("patches_chain")
-            ]
+            ],
+            webseeds=[WebSeedURL.parse(p) for p in xml.iterfind("web_seeds/url")],
+            meta_need_update=xml.find("meta_need_update").text,
+            version_name=xml.find("version_name").text,
         )
 
 
