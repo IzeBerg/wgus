@@ -33,7 +33,6 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         run: flit install --symlink
       - name: Lint
-        if: ${{ matrix.python-version != '3.6' }}
         run: bash scripts/lint.sh
       - name: Test
         run: bash scripts/test.sh

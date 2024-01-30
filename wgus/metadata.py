@@ -15,11 +15,13 @@ class ClientTypePart(BaseModel):
 
     @classmethod
     def parse(cls, xml: Optional[ElementTree.Element]) -> "ClientTypePart":
-        return cls(
-            id=xml.get("id"),
-            integrity=xml.get("integrity"),
-            app_type=xml.get("app_type"),
-            lang=xml.get("lang"),
+        return cls.parse_obj(
+            dict(
+                id=xml.get("id"),
+                integrity=xml.get("integrity"),
+                app_type=xml.get("app_type"),
+                lang=xml.get("lang"),
+            )
         )
 
 
@@ -30,13 +32,15 @@ class ClientType(BaseModel):
 
     @classmethod
     def parse(cls, xml: Optional[ElementTree.Element]) -> "ClientType":
-        return cls(
-            id=xml.get("id"),
-            arch=xml.get("arch"),
-            parts=[
-                ClientTypePart.parse(ctp)
-                for ctp in xml.iterfind("client_parts/client_part")
-            ],
+        return cls.parse_obj(
+            dict(
+                id=xml.get("id"),
+                arch=xml.get("arch"),
+                parts=[
+                    ClientTypePart.parse(ctp)
+                    for ctp in xml.iterfind("client_parts/client_part")
+                ],
+            )
         )
 
 
@@ -54,9 +58,11 @@ class ClientTypes(BaseModel):
 
     @classmethod
     def parse(cls, xml: Optional[ElementTree.Element]) -> "ClientTypes":
-        return cls(
-            types=[ClientType.parse(ct) for ct in xml.iterfind("client_type")],
-            default=xml.get("default"),
+        return cls.parse_obj(
+            dict(
+                types=[ClientType.parse(ct) for ct in xml.iterfind("client_type")],
+                default=xml.get("default"),
+            )
         )
 
 
@@ -70,12 +76,14 @@ class PredefinedSection(BaseModel):
 
     @classmethod
     def parse(cls, xml: Optional[ElementTree.Element]) -> "PredefinedSection":
-        return cls(
-            app_id=xml.find("app_id").text,
-            chain_id=xml.find("chain_id").text,
-            supported_languages=xml.find("supported_languages").text.split(","),
-            default_language=xml.find("default_language").text,
-            client_types=ClientTypes.parse(xml.find("client_types")),
+        return cls.parse_obj(
+            dict(
+                app_id=xml.find("app_id").text,
+                chain_id=xml.find("chain_id").text,
+                supported_languages=xml.find("supported_languages").text.split(","),
+                default_language=xml.find("default_language").text,
+                client_types=ClientTypes.parse(xml.find("client_types")),
+            )
         )
 
 
@@ -86,9 +94,13 @@ class Metadata(BaseModel):
     @classmethod
     def parse(cls, text: str) -> "Metadata":
         xml = ElementTree.fromstring(text)
-        return cls(
-            version=xml.find("version").text,
-            predefined_section=PredefinedSection.parse(xml.find("predefined_section")),
+        return cls.parse_obj(
+            dict(
+                version=xml.find("version").text,
+                predefined_section=PredefinedSection.parse(
+                    xml.find("predefined_section")
+                ),
+            )
         )
 
 

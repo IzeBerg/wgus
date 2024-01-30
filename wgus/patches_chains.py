@@ -14,9 +14,11 @@ class PatchTorrent(BaseModel):
 
     @classmethod
     def parse(cls, xml: Optional[ElementTree.Element]) -> "PatchTorrent":
-        return cls(
-            hash=xml.find("hash").text,
-            urls=[u.text for u in xml.iterfind("urls/url")],
+        return cls.parse_obj(
+            dict(
+                hash=xml.find("hash").text,
+                urls=[u.text for u in xml.iterfind("urls/url")],
+            )
         )
 
 
@@ -28,11 +30,13 @@ class PatchFile(BaseModel):
 
     @classmethod
     def parse(cls, xml: ElementTree.Element) -> "PatchFile":
-        return cls(
-            name=xml.find("name").text,
-            size=xml.find("size").text,
-            unpacked_size=xml.findtext("unpacked_size"),
-            diffs_size=xml.findtext("diffs_size"),
+        return cls.parse_obj(
+            dict(
+                name=xml.find("name").text,
+                size=xml.find("size").text,
+                unpacked_size=xml.findtext("unpacked_size"),
+                diffs_size=xml.findtext("diffs_size"),
+            )
         )
 
 
@@ -44,11 +48,13 @@ class Patch(BaseModel):
 
     @classmethod
     def parse(cls, xml: Optional[ElementTree.Element]) -> "Patch":
-        return cls(
-            files=[PatchFile.parse(ct) for ct in xml.iterfind("files/file")],
-            torrent=PatchTorrent.parse(xml.find("torrent")),
-            part=xml.find("part").text,
-            version_to=xml.find("version_to").text,
+        return cls.parse_obj(
+            dict(
+                files=[PatchFile.parse(ct) for ct in xml.iterfind("files/file")],
+                torrent=PatchTorrent.parse(xml.find("torrent")),
+                part=xml.find("part").text,
+                version_to=xml.find("version_to").text,
+            )
         )
 
 
@@ -59,10 +65,12 @@ class WebSeedURL(BaseModel):
 
     @classmethod
     def parse(cls, xml: ElementTree.Element) -> "WebSeedURL":
-        return cls(
-            url=xml.text,
-            threads=xml.get("threads"),
-            name=xml.get("name"),
+        return cls.parse_obj(
+            dict(
+                url=xml.text,
+                threads=xml.get("threads"),
+                name=xml.get("name"),
+            )
         )
 
 
@@ -72,9 +80,11 @@ class PatchesChain(BaseModel):
 
     @classmethod
     def parse(cls, xml: ElementTree.Element) -> "PatchesChain":
-        return cls(
-            type=xml.get("type"),
-            patches=[Patch.parse(p) for p in xml.iterfind("patch")],
+        return cls.parse_obj(
+            dict(
+                type=xml.get("type"),
+                patches=[Patch.parse(p) for p in xml.iterfind("patch")],
+            )
         )
 
 
@@ -87,13 +97,15 @@ class PatchesChains(BaseModel):
     @classmethod
     def parse(cls, text: str) -> "PatchesChains":
         xml = ElementTree.fromstring(text)
-        return cls(
-            patches_chain=[
-                PatchesChain.parse(pc) for pc in xml.iterfind("patches_chain")
-            ],
-            webseeds=[WebSeedURL.parse(p) for p in xml.iterfind("web_seeds/url")],
-            meta_need_update=xml.find("meta_need_update").text,
-            version_name=xml.find("version_name").text,
+        return cls.parse_obj(
+            dict(
+                patches_chain=[
+                    PatchesChain.parse(pc) for pc in xml.iterfind("patches_chain")
+                ],
+                webseeds=[WebSeedURL.parse(p) for p in xml.iterfind("web_seeds/url")],
+                meta_need_update=xml.find("meta_need_update").text,
+                version_name=xml.find("version_name").text,
+            )
         )
 
 
